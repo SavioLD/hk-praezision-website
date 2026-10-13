@@ -20,21 +20,21 @@ export const FIRMA = {
   maps: 'https://www.google.com/maps/search/?api=1&query=Neckarstra%C3%9Fe+1%2C+78727+Oberndorf+am+Neckar'
 };
 
-/* Videos zu den drei Skripten. Sobald gedreht: YouTube-ID ODER Pfad zur
+/* Videos laut Miro-Board. Sobald gedreht: YouTube-ID ODER Pfad zur
    MP4-Datei (relativ zum Website-Ordner, z. B. "videos/skript1.mp4").
    Leer = Platzhalter „Video folgt". YouTube lädt erst nach Klick
    (youtube-nocookie) – keine Verbindung beim Seitenaufruf. */
 export const VIDEOS = {
-  skript1: { youtube: '', mp4: '' },   // Spanntechnik / Simultanes Engineering
-  skript2: { youtube: '', mp4: '' },   // Unternehmenspositionierung
-  skript3: { youtube: '', mp4: '' }    // Composite-Erwärmungsöfen
+  unternehmen:  { youtube: '', mp4: '' },   // Startseite + Über uns (Sprechertext im Miro-Board)
+  spanntechnik: { youtube: '', mp4: '' },   // Werkstück-Spanntechnik: Simultanes Engineering
+  karriere:     { youtube: '', mp4: '' }    // Karriere (90-Sekunden- bzw. 2–3-Minuten-Version)
 };
 
 export const CONFIG = {
   /* true = Designentwurf: Hinweisleiste oben, Platzhalter-Kästen sichtbar,
      noindex. Für den Livegang auf false setzen. */
   entwurf: true,
-  stand: '12.10.2026',
+  stand: '13.10.2026',
   baseUrl: 'https://www.hk-prt.de/',
 
   /* Ziel für das Anfrage-Tool (POST, JSON). Leer = Entwurfsmodus,

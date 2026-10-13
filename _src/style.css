@@ -361,7 +361,7 @@ strong,b{font-weight:600}
 /* ---------- Platzhalter-Hinweis (nur Entwurf) ---------- */
 .hinweis{border:2px dashed #c9a43a;background:#fff8e6;color:#4f3f0e;padding:18px 22px;font-size:.9375rem;line-height:1.5;max-width:900px}
 .hinweis b{display:block;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;color:#7a5f0c}
-.sec--hinweis{padding:32px 0 0}
+.sec--hinweis{padding:32px 0}
 .dunkel .hinweis{margin-top:28px}
 
 /* ---------- Anfrage-Tool ---------- */
@@ -382,7 +382,7 @@ strong,b{font-weight:600}
 .schritt__hilfe{color:var(--ink-2);margin-bottom:20px}
 .optionen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .optionen--eins{grid-template-columns:minmax(0,1fr)}
-@media (max-width:560px){.optionen{grid-template-columns:minmax(0,1fr)}.schritt{min-height:640px}}
+@media (max-width:560px){.optionen{grid-template-columns:minmax(0,1fr)}.schritt{min-height:640px}.optionen--kompakt{grid-template-columns:repeat(2,minmax(0,1fr))}.optionen--kompakt label{padding:12px 10px;gap:8px;font-size:.9375rem;min-height:56px}.optionen--kompakt label::before{width:18px;height:18px}}
 .option{position:relative}
 .option input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
 .option label{display:flex;gap:12px;align-items:flex-start;min-height:60px;padding:15px 16px;border:1.5px solid #c4c9c6;cursor:pointer;line-height:1.35;transition:border-color .15s,background-color .15s;height:100%}
@@ -456,5 +456,36 @@ strong,b{font-weight:600}
 .fuss .sprache li+li::before{color:rgba(255,255,255,.3)}
 @media (max-width:980px){.fuss__raster{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.fuss__raster{grid-template-columns:minmax(0,1fr);gap:32px}}
+
+
+/* ---------- Ergänzungen für das Miro-Board-Layout ---------- */
+.seitenkopf__aufruf{margin-top:22px;font-weight:600;color:#fff;font-size:1.0625rem}
+.seitenkopf__aufruf+.btns{margin-top:16px}
+.logos{padding:28px 0;border-bottom:1px solid var(--linie);background:#fff}
+.logos__titel{text-align:center;font-size:.75rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin-bottom:16px}
+.logos ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
+.logos li{min-height:64px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px 12px;background:var(--stein-50);border:1px dashed var(--stein);color:var(--ink-2);font-size:.8125rem;font-weight:600;letter-spacing:.04em}
+.logos .hinweis{margin:18px auto 0}
+.videoblock .kopfzeile{margin-left:auto;margin-right:auto;text-align:center}
+.videoblock .kopfzeile .kicker{justify-content:center}
+.videoblock .video{max-width:920px;margin:0 auto}
+.ablauf{counter-reset:a;max-width:980px}
+.ablauf li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:20px;padding:24px 0;border-top:1px solid var(--linie)}
+.ablauf li:last-child{border-bottom:1px solid var(--linie)}
+.ablauf li::before{counter-increment:a;content:counter(a,decimal-leading-zero);font-family:var(--f-display);font-weight:700;font-size:2.4rem;line-height:1;color:var(--gruen)}
+.ablauf h3{color:var(--gruen-950)}
+.ablauf p{margin-top:8px;color:var(--ink-2)}
+@media (max-width:600px){.ablauf li{grid-template-columns:48px minmax(0,1fr);gap:12px}.ablauf li::before{font-size:1.8rem}}
+.karte__untertitel{margin-top:8px!important;font-weight:600;color:var(--gruen-900)!important}
+.karte p+p{margin-top:10px}
+.liste--klein{margin-top:14px;gap:8px}
+.liste--klein li{font-size:.9375rem}
+.karten__zusatz{margin-top:24px;color:var(--ink-2)}
+.fliess .liste+p,.fliess .liste+.btns{margin-top:20px}
+.karten__zusatz a,.fliess p a{color:var(--gruen-900);font-weight:600}
+.bildfig figcaption{margin-top:10px;font-size:.875rem;line-height:1.45;color:var(--ink-2)}
+.dunkel .bildfig figcaption{color:rgba(255,255,255,.72)}
+.hinweis--abschnitt{margin-top:28px}
+.kopf--marke .marke__text b{font-size:1.6rem;letter-spacing:.06em;text-transform:uppercase}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}

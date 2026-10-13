@@ -24,7 +24,7 @@ import en from './inhalte/en.mjs';
 const SRC = dirname(fileURLToPath(import.meta.url));
 const OUT = join(SRC, '..');
 const SPRACHEN = [de, en];
-const SEITEN = ['start', 'spanntechnik', 'oefen', 'silikon', 'saegen', 'unternehmen', 'karriere', 'kontakt', 'impressum', 'datenschutz'];
+const SEITEN = ['start', 'spanntechnik', 'thermoplast', 'spezial', 'saegen', 'ueberuns', 'karriere', 'kontakt', 'impressum', 'datenschutz', 'schenk'];
 
 /* ---------- Logo: Originaldatei bevorzugt, sonst Ausschnitt aus der Signatur ---------- */
 const LOGO = ['bilder/hk-logo.svg', 'bilder/hk-logo.png', 'bilder/hk-logo-aus-signatur.png'].find(p => existsSync(join(OUT, p)));
@@ -74,11 +74,13 @@ function video(ctx, v) {
 
 function bild(ctx, b) {
   const ar = b.format || '4/3';
-  if (existsSync(join(OUT, 'bilder', b.datei))) {
-    return `<div class="bild" style="--ar:${ar}"><img src="${ctx.A}bilder/${b.datei}" alt="${esc(b.alt || '')}" loading="lazy" decoding="async"></div>`;
-  }
-  return `<div class="bild bild--leer" style="--ar:${ar}">${icon('kamera')}<b>${b.text}</b><span>${ctx.spr.ui.bildFolgt} · bilder/${b.datei}</span></div>`;
+  const kern = existsSync(join(OUT, 'bilder', b.datei))
+    ? `<div class="bild" style="--ar:${ar}"><img src="${ctx.A}bilder/${b.datei}" alt="${esc(b.alt || '')}" loading="lazy" decoding="async"></div>`
+    : `<div class="bild bild--leer" style="--ar:${ar}">${icon('kamera')}<b>${b.text}</b><span>${ctx.spr.ui.bildFolgt} · bilder/${b.datei}</span></div>`;
+  return b.unterschrift ? `<figure class="bildfig">${kern}<figcaption>${b.unterschrift}</figcaption></figure>` : kern;
 }
+/* Platzhalter-Kasten (nur im Entwurf sichtbar) */
+const hinweisBox = (ctx, t) => (t && CONFIG.entwurf ? `<div role="note" class="hinweis hinweis--abschnitt"><b>${ctx.spr.ui.platzhalter}</b>${txt(ctx, t)}</div>` : '');
 
 function kopfzeile(ctx, s, id) {
   if (!s.h2) return '';
@@ -108,11 +110,11 @@ const R = {
       `<nav class="krumen" aria-label="${ui.brotkrumen}"><ol><li><a href="${href(ctx, 'start')}">${ui.startseite}</a></li>` +
       (gruppe ? `<li>${gruppe.text}</li>` : '') + `<li aria-current="page">${ctx.seite.name}</li></ol></nav>`;
     const medien = s.video ? video(ctx, s.video) : s.bild ? bild(ctx, s.bild) : '';
-    const hinweis = s.hinweis && CONFIG.entwurf ? `<aside class="hinweis"><b>${ui.platzhalter}</b>${txt(ctx, s.hinweis)}</aside>` : '';
+    const hinweis = s.hinweis && CONFIG.entwurf ? `<div role="note" class="hinweis"><b>${ui.platzhalter}</b>${txt(ctx, s.hinweis)}</div>` : '';
     return `<section class="seitenkopf dunkel${start ? ' seitenkopf--start' : ''}${medien ? '' : ' seitenkopf--solo'}" aria-labelledby="h1">${messkreuz()}` +
       `<div class="wrap"><div class="seitenkopf__raster${medien ? '' : ' seitenkopf__raster--solo'}"><div>${krumen}` +
       `${s.kicker ? `<p class="kicker">${s.kicker}</p>` : ''}<h1 id="h1">${s.h1}</h1>` +
-      `${s.lead ? `<p class="seitenkopf__lead">${txt(ctx, s.lead)}</p>` : ''}${knoepfe(ctx, s.knoepfe)}${hinweis}</div>` +
+      `${s.lead ? `<p class="seitenkopf__lead">${txt(ctx, s.lead)}</p>` : ''}${s.aufruf ? `<p class="seitenkopf__aufruf">${s.aufruf}</p>` : ''}${knoepfe(ctx, s.knoepfe)}${hinweis}</div>` +
       `${medien ? `<div>${medien}</div>` : ''}</div></div></section>`;
   },
 
@@ -125,13 +127,16 @@ const R = {
     const n = s.spalten || 3;
     const karten = s.liste.map(k => {
       const ic = k.icon ? `<span class="karte__icon">${icon(s.variante === 'vorteile' && !k.icon ? 'check' : k.icon)}</span>` : '';
-      const link = k.seite ? `<a class="karte__link" href="${href(ctx, k.seite, k.extra || '')}">${k.link}${icon('pfeil')}</a>` : '';
+      const ziel = k.seite ? href(ctx, k.seite, k.extra || '') : k.href;
+      const link = ziel ? `<a class="karte__link" href="${ziel}">${k.link}${icon('pfeil')}</a>` : '';
       return `<article class="karte">${k.bild ? bild(ctx, k.bild) : ''}${ic}${k.tag ? `<p class="karte__tag">${k.tag}</p>` : ''}` +
-        `<h3>${k.titel}</h3>${k.text ? `<p>${txt(ctx, k.text)}</p>` : ''}${link}</article>`;
+        `<h3>${k.titel}</h3>${k.untertitel ? `<p class="karte__untertitel">${k.untertitel}</p>` : ''}` +
+        `${k.text ? `<p>${txt(ctx, k.text)}</p>` : ''}${(k.absaetze || []).map(a => `<p>${txt(ctx, a)}</p>`).join('')}` +
+        `${k.liste ? `<ul class="liste liste--klein">${k.liste.map(x => `<li>${icon('check')}<span>${txt(ctx, x)}</span></li>`).join('')}</ul>` : ''}${link}</article>`;
     }).join('');
     const teaser = s.teaser ? `<a class="teaser" href="${href(ctx, s.teaser.seite)}"><span class="teaser__neu">${s.teaser.marke}</span><b>${s.teaser.text}</b>${icon('pfeil')}</a>` : '';
     return sektion(`sec${s.stein ? ' sec--stein' : ''}`, id,
-      kopfzeile(ctx, s, id) + `<div class="karten${s.variante ? ' karten--' + s.variante : ''}" style="--spalten:${n}">${karten}</div>${teaser}${nachsatz(ctx, s)}`, s.anker);
+      kopfzeile(ctx, s, id) + `<div class="karten${s.variante ? ' karten--' + s.variante : ''}" style="--spalten:${n}">${karten}</div>${teaser}${nachsatz(ctx, s)}${s.zusatz ? `<p class="karten__zusatz">${txt(ctx, s.zusatz)}</p>` : ''}${hinweisBox(ctx, s.hinweis)}`, s.anker);
   },
 
   zitat(ctx, s) {
@@ -183,8 +188,8 @@ const R = {
     const ton = s.dunkel ? ' dunkel' : s.stein ? ' sec--stein' : '';
     return sektion(`sec${ton}`, id,
       `<div class="${klasse}"><div class="fliess">${s.kicker ? `<p class="kicker">${s.kicker}</p>` : ''}<h2 id="${id}">${s.h2}</h2>` +
-      `${(s.absaetze || []).map(p => `<p>${txt(ctx, p)}</p>`).join('')}${liste}${knoepfe(ctx, s.knoepfe)}</div>` +
-      `${medien ? `<div class="split__medien">${medien}</div>` : ''}</div>`, s.anker);
+      `${(s.absaetze || []).map(p => `<p>${txt(ctx, p)}</p>`).join('')}${liste}${(s.schluss || []).map(p => `<p>${txt(ctx, p)}</p>`).join('')}${knoepfe(ctx, s.knoepfe)}</div>` +
+      `${medien ? `<div class="split__medien">${medien}</div>` : ''}</div>${hinweisBox(ctx, s.hinweis)}`, s.anker);
   },
 
   tabelle(ctx, s) {
@@ -212,13 +217,32 @@ const R = {
       `<div>${knoepfe(ctx, s.knoepfe)}${s.telefon === false ? '' : `<p class="cta__tel">${ui.oderAnrufen} <a href="tel:${FIRMA.telefonLink}">${FIRMA.telefon}</a></p>`}</div></div></section>`;
   },
 
+  /* Logo-Leiste (Kunden/Partner) */
+  logos(ctx, s) {
+    return `<div class="logos"><div class="wrap">${s.titel ? `<p class="logos__titel">${s.titel}</p>` : ''}` +
+      `<ul>${s.liste.map(l => `<li>${l}</li>`).join('')}</ul>${hinweisBox(ctx, s.hinweis)}</div></div>`;
+  },
+
+  /* Großes Video mit Überschrift */
+  videoblock(ctx, s) {
+    const id = 'h-' + (++zaehler);
+    return sektion(`sec${s.stein ? ' sec--stein' : ''} videoblock`, id, kopfzeile(ctx, s, id) + video(ctx, s.video) + nachsatz(ctx, s) + hinweisBox(ctx, s.hinweis), s.anker);
+  },
+
+  /* Ablauf in nummerierten Schritten */
+  ablauf(ctx, s) {
+    const id = 'h-' + (++zaehler);
+    return sektion(`sec${s.stein ? ' sec--stein' : ''}`, id, kopfzeile(ctx, s, id) +
+      `<ol class="ablauf">${s.liste.map(p => `<li><div><h3>${p.titel}</h3><p>${txt(ctx, p.text)}</p></div></li>`).join('')}</ol>${nachsatz(ctx, s)}${hinweisBox(ctx, s.hinweis)}`, s.anker);
+  },
+
   hinweis(ctx, s) {
     if (!CONFIG.entwurf) return '';
-    return `<div class="sec--hinweis"><div class="wrap"><aside class="hinweis"><b>${ctx.spr.ui.platzhalter}</b>${txt(ctx, s.text)}</aside></div></div>`;
+    return `<div class="sec--hinweis"><div class="wrap"><div role="note" class="hinweis"><b>${ctx.spr.ui.platzhalter}</b>${txt(ctx, s.text)}</div></div></div>`;
   },
 
   prosa(ctx, s) {
-    const hinweis = s.hinweis && CONFIG.entwurf ? `<aside class="hinweis"><b>${ctx.spr.ui.platzhalter}</b>${txt(ctx, s.hinweis)}</aside>` : '';
+    const hinweis = s.hinweis && CONFIG.entwurf ? `<div role="note" class="hinweis"><b>${ctx.spr.ui.platzhalter}</b>${txt(ctx, s.hinweis)}</div>` : '';
     return sektion('sec', null, `<div class="prosa">${hinweis}${txt(ctx, s.html)}</div>`);
   },
 
@@ -227,7 +251,7 @@ const R = {
     const pf = icon('pfeil');
     const weiter = `<button type="button" class="btn btn--primaer" data-schritt="weiter">${f.weiter}${pf}</button>`;
     const zurueck = `<button type="button" class="btn--zurueck" data-schritt="zurueck">${f.zurueck}</button>`;
-    const radios = (name, liste, eins) => `<div class="optionen${eins ? ' optionen--eins' : ''}">` + liste.map(o =>
+    const radios = (name, liste, eins, kompakt) => `<div class="optionen${eins ? ' optionen--eins' : ''}${kompakt ? ' optionen--kompakt' : ''}">` + liste.map(o =>
       `<div class="option"><input type="radio" id="${name}-${o.wert}" name="${name}" value="${o.wert}" data-text="${esc(o.text)}" required>` +
       `<label for="${name}-${o.wert}"><span>${o.text}${o.klein ? `<small>${o.klein}</small>` : ''}</span></label></div>`).join('') + `</div>`;
     const feld = (name, typ, label, pflicht, auto) =>
@@ -240,7 +264,7 @@ const R = {
       `<div class="anfrage"><div class="anfrage__fortschritt"><p id="anfrage-schritt" aria-live="polite">${f.schritt.replace('{n}', 1).replace('{g}', anzahl)}</p>` +
       `<div class="anfrage__balken" aria-hidden="true"><span id="anfrage-balken"></span></div></div>` +
       `<form id="anfrage" novalidate>` +
-      schritt(`<legend tabindex="-1">${f.s1}</legend><p class="schritt__hilfe">${f.s1hilfe}</p>${radios('bereich', f.bereiche)}`, weiter) +
+      schritt(`<legend tabindex="-1">${f.s1}</legend><p class="schritt__hilfe">${f.s1hilfe}</p>${radios('bereich', f.bereiche, false, true)}`, weiter) +
       schritt(`<legend tabindex="-1">${f.s2}</legend><p class="schritt__hilfe">${f.s2hilfe}</p>${radios('projektstand', f.stände, true)}`, zurueck + weiter) +
       schritt(`<legend tabindex="-1">${f.s3}</legend><p class="schritt__hilfe">${f.s3hilfe}</p>${radios('zeitrahmen', f.zeiten, true)}`, zurueck + weiter) +
       schritt(`<legend tabindex="-1">${f.s4}</legend><p class="schritt__hilfe">${f.s4hilfe}</p>` +
@@ -269,6 +293,16 @@ function sprachwahl(ctx) {
 function kopf(ctx) {
   const { spr, id } = ctx;
   const ui = spr.ui;
+  const ek = ctx.seite.eigenerKopf;
+  if (ek) {
+    /* Eigene Marke mit eigener Navigation (Sprungmarken), wie im Miro-Board */
+    return `<header class="kopf kopf--marke" id="kopf"><div class="wrap kopf__in">` +
+      `<a class="marke" href="#inhalt"><span class="marke__text"><b>${ek.marke}</b><small>${ek.claim}</small></span></a>` +
+      `<button type="button" class="burger" aria-expanded="false" aria-controls="hauptnav"><span class="burger__box" aria-hidden="true"><span></span></span><span>${ui.menue}</span></button>` +
+      `<nav id="hauptnav" class="nav" aria-label="${ek.marke}"><ul class="nav__liste">${ek.nav.map(n => `<li><a href="#${n.anker}">${n.text}</a></li>`).join('')}</ul>` +
+      `<div class="nav__meta">${sprachwahl(ctx)}<a class="btn btn--primaer btn--klein" href="#${ek.cta.anker}">${ek.cta.text}</a></div></nav>` +
+      `</div></header>`;
+  }
   const punkte = spr.nav.map((n, i) => {
     if (n.kinder) {
       const aktiv = n.kinder.includes(id);
@@ -295,8 +329,8 @@ function fuss(ctx) {
   return `<footer class="fuss"><div class="wrap"><div class="fuss__raster">` +
     `<div><a class="fuss__marke" href="${href(ctx, 'start')}"><img src="${ctx.A}${LOGO}" alt="" width="31" height="46"><b>${FIRMA.marke}</b></a>` +
     `<p class="fuss__claim">${FIRMA.claim}</p><p>${ui.fussText}</p>${social}</div>` +
-    `<nav aria-labelledby="f-bereiche"><h2 id="f-bereiche">${ui.bereiche}</h2><ul>${['spanntechnik', 'oefen', 'silikon', 'saegen'].map(li).join('')}</ul></nav>` +
-    `<nav aria-labelledby="f-firma"><h2 id="f-firma">${ui.unternehmen}</h2><ul>${['unternehmen', 'karriere', 'kontakt'].map(li).join('')}</ul></nav>` +
+    `<nav aria-labelledby="f-bereiche"><h2 id="f-bereiche">${ui.bereiche}</h2><ul>${['spanntechnik', 'thermoplast', 'spezial', 'saegen'].map(li).join('')}</ul></nav>` +
+    `<nav aria-labelledby="f-firma"><h2 id="f-firma">${ui.unternehmen}</h2><ul>${['ueberuns', 'karriere', 'kontakt'].map(li).join('')}</ul></nav>` +
     `<div><h2>${ui.kontakt}</h2><address>${FIRMA.name}<br>${FIRMA.strasse}<br>${FIRMA.plz} ${FIRMA.ort}<br>` +
     `<a href="tel:${FIRMA.telefonLink}">${FIRMA.telefon}</a><br><a href="mailto:${FIRMA.email}">${FIRMA.email}</a></address></div>` +
     `</div><div class="fuss__unten"><p>© ${new Date().getFullYear()} ${FIRMA.name}</p><ul>${li('impressum')}${li('datenschutz')}</ul>${sprachwahl(ctx)}</div></div></footer>`;
