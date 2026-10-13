@@ -14,7 +14,7 @@ an Technik und Qualität) und die Firmendaten aus der E-Mail-Signatur.
 
 ## Ansehen
 
-- **GitHub Pages:** `https://saviold.github.io/hk-praezision/`
+- **GitHub Pages:** `https://saviold.github.io/hk-praezision-website/`
 - **Lokal:** im Ordner `python3 -m http.server` starten, dann `http://localhost:8000`
 
 Der Entwurf steht auf **noindex** und zeigt oben die Leiste „Designentwurf – nicht öffentlich“.
